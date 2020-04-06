@@ -14,11 +14,10 @@ int main(int argc, char const *argv[])
         printf("B\n");
     else if (score <= 79 && score >= 70)
         printf("C\n");
-    else if (score <= 79 && score >= 70)
+    else if (score <= 69 && score >= 60)
         printf("D\n");
     else
         printf("F\n");
-    
 
     return 0;
 }
