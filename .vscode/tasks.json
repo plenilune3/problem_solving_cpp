@@ -26,7 +26,7 @@
         }, 
         {
             "label" : "excute", 
-            "command" : "./${fileBasenameNoExtension}.out", 
+            "command" : "${fileDirname}/${fileBasenameNoExtension}.out", 
             "group": "test", 
         }
     ]
