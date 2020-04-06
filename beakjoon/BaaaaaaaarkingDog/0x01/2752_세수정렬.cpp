@@ -11,17 +11,14 @@ int main(int argc, char const *argv[])
     if (a > b)
     {
         temp = a; a = b; b = temp;
-        printf("%d %d %d\n", a, b, c);
     }
     if (b > c)
     {
         temp = b; b = c; c = temp;
-        printf("%d %d %d\n", a, b, c);
     }
     if (a > b)
     {
         temp = a; a = b; b = temp;
-        printf("%d %d %d\n", a, b, c);
     }
     
     printf("%d %d %d\n", a, b, c);
