@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
                 printf("0\n");
         }
         else
-            printf("0\n");
+            printf("1\n");
     }
     else
         printf("0\n");
