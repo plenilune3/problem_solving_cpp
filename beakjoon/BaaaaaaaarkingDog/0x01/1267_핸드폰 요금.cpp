@@ -15,8 +15,7 @@ int main(int argc, char const *argv[])
         Y += ((temp / 30) + 1) * 10;
         M += ((temp / 60) + 1) * 15;
     }
-    printf("M %d\n", M);
-    printf("Y %d\n", Y);
+    
     if (Y == M) printf("Y M %d\n", Y);
     else if (Y < M) printf("Y %d\n", Y);
     else printf("M %d\n", M);
