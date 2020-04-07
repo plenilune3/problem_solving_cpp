@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
 
     while (result > 0)
     {
-        number_count[result%10] += 1;
+        number_count[result % 10] += 1;
         result = result / 10;
     }
 
