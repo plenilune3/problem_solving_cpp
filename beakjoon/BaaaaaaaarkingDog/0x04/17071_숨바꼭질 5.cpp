@@ -1,5 +1,4 @@
 #include <cstdio>
-#include <algorithm>
 #include <queue>
 
 using namespace std;
@@ -15,12 +14,11 @@ struct position
 
 int dx[] = {-1, 1, 0};
 int dm[] = {1, 1, 2};
-bool visited[2][MAX] = { false };
 
-int bfs(int N, int K)
+int bfs(int N, int K, bool visited[][2])
 {
     queue<position> q;
-    visited[0][N] = true;
+    visited[N][0] = true;
     q.push({N, K, 0});
 
     while(!q.empty())
@@ -28,7 +26,7 @@ int bfs(int N, int K)
         position c = q.front();
         q.pop();
 
-        if (visited[c.count % 2][c.k])
+        if (visited[c.k][c.count % 2])
             return c.count;
         
         for (int i = 0; i < 3; i++)
@@ -40,9 +38,9 @@ int bfs(int N, int K)
             if (nn < 0 || nn > MAX || nk > MAX)
                 continue;
             
-            if (visited[nc % 2][nn] == false)
+            if (visited[nn][nc % 2] == false)
             {
-                visited[nc % 2][nn] = true;
+                visited[nn][nc % 2] = true;
                 q.push({nn, nk, nc});
             }
         }
@@ -56,7 +54,10 @@ int main(int argc, char const *argv[])
     int N, K;
     scanf("%d %d", &N, &K);
 
-    int answer = bfs(N, K);
+    bool visited[MAX][2];
+    fill_n(&visited[0][0], MAX*2, false);
+
+    int answer = bfs(N, K, visited);
     printf("%d\n", answer);
 
     return 0;
