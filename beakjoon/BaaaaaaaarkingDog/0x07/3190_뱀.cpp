@@ -24,7 +24,8 @@ int main(int argc, char const *argv[])
 
     queue<direction> q;
     queue<body> snake;
-    snake.push({1, 1});
+    body init = {1, 1};
+    snake.push(init);
     board[1][1] = true;
 
     int N, K, L;
@@ -48,7 +49,8 @@ int main(int argc, char const *argv[])
         char d;
         cin >> t >> d;
 
-        q.push({t, d});
+        direction init = {t, d};
+        q.push(init);
     }
 
     int time = 0;
@@ -83,7 +85,8 @@ int main(int argc, char const *argv[])
         }
         
         board[x][y] = 2;
-        snake.push({x, y});
+        body head = {x, y};
+        snake.push(head);
         
         time++;
     }
