@@ -10,7 +10,7 @@ const int dy[] = {0, 0, -1, 1};
 
 int A[MAX][MAX];
 bool visited[MAX][MAX];
-int N, L, R;
+int N, L, R, cnt;
 
 int dfs(int depth, int x, int y, vector< pair<int, int> >& v)
 {
@@ -29,7 +29,10 @@ int dfs(int depth, int x, int y, vector< pair<int, int> >& v)
         int diff = abs(A[x][y] - A[nx][ny]);
         
         if (diff >= L && diff <= R)
+        {
+            cnt++;
             result += dfs(depth + 1, nx, ny, v);
+        }
     }
 
     return result;
@@ -59,14 +62,15 @@ int main(int argc, char const *argv[])
                 int population = 0;
 
                 if (visited[i][j] == false)
+                {
+                    cnt = 1;
                     population = dfs(0, i, j, v);
-                
-                int aliance = v.size();
+                }
 
-                if (aliance > 1)
+                if (cnt > 1)
                 {
                     possible = true;
-                    int population_average = population / aliance;
+                    int population_average = population / cnt;
 
                     vector< pair<int, int> >::iterator iter;
                     for (iter = v.begin(); iter != v.end(); iter++)
