@@ -1,5 +1,5 @@
 #include <iostream>
-#include <vector>
+#include <deque>
 #include <algorithm>
 
 using namespace std;
@@ -8,27 +8,33 @@ const int MAX = 11;
 const int dx[] = {-1, -1, -1, 0, 0, 1, 1, 1};
 const int dy[] = {-1, 0, 1, -1 ,1, -1, 0, 1};
 
-class tree 
+// class tree 
+// {
+// public:
+//     int age;
+//     bool alive;
+
+//     tree(int a, bool b)
+//     {
+//         age = a;
+//         alive = b;
+//     }
+
+//     bool operator<(const tree &t) const
+//     {
+//         return (age < t.age);
+//     }
+// };
+
+struct tree
 {
-public:
     int age;
     bool alive;
-
-    tree(int a, bool b)
-    {
-        age = a;
-        alive = b;
-    }
-
-    bool operator<(const tree &t) const
-    {
-        return (age < t.age);
-    }
 };
 
 int land_food[MAX][MAX];
 int A[MAX][MAX];
-vector<tree> land_tree[MAX][MAX];
+deque<tree> land_tree[MAX][MAX];
 int N, M, K;
 
 void spring()
@@ -39,8 +45,7 @@ void spring()
             if (land_tree[i][j].empty())
                 continue;
 
-            sort(land_tree[i][j].begin(), land_tree[i][j].end());
-            vector<tree>::iterator iter;
+            deque<tree>::iterator iter;
             for (iter = land_tree[i][j].begin(); iter != land_tree[i][j].end(); iter++)
             {
                 int food = land_food[i][j];
@@ -83,10 +88,9 @@ void fall()
             if (land_tree[x][y].empty())
                 continue;
             
-            vector<tree>::iterator iter;
+            deque<tree>::iterator iter;
             for (iter = land_tree[x][y].begin(); iter != land_tree[x][y].end(); iter++)
                 if ((*iter).age % 5 == 0)
-                {
                     for (int i = 0; i < 8; i++)
                     {
                         int nx = x + dx[i];
@@ -95,10 +99,9 @@ void fall()
                         if (nx < 1 || nx > N || ny < 1 || ny > N)
                             continue;
                         
-                        tree t(1, true);
-                        land_tree[nx][ny].push_back(t);
+                        tree t = {1, true};
+                        land_tree[nx][ny].push_front(t);
                     }
-                }
         }
 }
 
@@ -128,7 +131,7 @@ int main(int argc, char const *argv[])
         
         cin >> x >> y >> z;
 
-        tree t(z, true);
+        tree t = {z, true};
         land_tree[x][y].push_back(t);
     }
     
