@@ -1,6 +1,5 @@
 #include <iostream>
-#include <deque>
-#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -8,34 +7,44 @@ const int MAX = 11;
 
 int N, K;
 int A[MAX][MAX];
-deque<int> B[3];
-vector<int> v;
+int B[3][20];
 bool visited[MAX];
 bool answer;
 
 void game()
 {
-    deque<int> C[3];
-    copy(&B[0], &B[0] + 3, &C[0]);
+    int winning_cnt[3] = { 0, 0, 0 };
+    int player_cnt[3] = { 0, 0, 0 };
 
-    for (int i = 0; i < 3; i++)
+    int p1 = 0;
+    int p2 = 1;
+
+    while (true)
     {
-        for (int j = 0; j < 20; j++)
+        if (winning_cnt[0] == K)
         {
-            cout << C[i].front() << " ";
-            C[i].pop_front();
+            answer = true;
+            break;
         }
-        cout << "\n";
+        if (winning_cnt[1] == K || winning_cnt[2] == K || player_cnt[0] == N)
+            break;
+
+        if (p1 > p2)
+            swap(p1, p2);
+
+        if (A[B[p1][player_cnt[p1]]][B[p2][player_cnt[p2]]] == 2)
+        {
+            player_cnt[p1] += 1, player_cnt[p2] += 1;
+            winning_cnt[p1] += 1;
+            p2 = 3 - (p1 + p2);
+        }
+        else
+        {
+            player_cnt[p1] += 1, player_cnt[p2] += 1;
+            winning_cnt[p2] += 1;
+            p1 = 3 - (p1 + p2);
+        }
     }
-    // bool possible = true;
-    // int winning_cnt[] = { 0, 0, 0 };
-    // int winner = 0;
-
-    // while (true)
-    // {
-
-    // }
-    
 }
 
 void permutations(int depth)
@@ -54,34 +63,30 @@ void permutations(int depth)
         if (visited[i] == false)
         {
             visited[i] = true;
-            B[0].push_back(i);
+            B[0][depth] = i;
             permutations(depth + 1);
             visited[i] = false;
-            B[0].pop_back();
+            B[0][depth] = 0;
         }
     }
 }
 
 int main(int argc, char const *argv[])
 {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL), cout.tie(NULL);
+
     cin >> N >> K;
 
     for (int i = 1; i <= N; i++)
         for (int j = 1; j <= N; j++)
             cin >> A[i][j];
     
-    for (int i = 1; i <= 2; i++)
+    for (int i = 1; i < 3; i++)
         for (int j = 0; j < 20; j++)
-        {
-            int t;
-            cin >> t;
-
-            B[i].push_back(t);
-        }
+            cin >> B[i][j];
     
-    // permutations(0);
-
-    game();
+    permutations(0);
 
     cout << answer << "\n";
 
