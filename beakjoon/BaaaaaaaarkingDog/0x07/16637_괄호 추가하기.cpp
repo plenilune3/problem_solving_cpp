@@ -1,8 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstdlib>
 #include <sstream>
+#include <algorithm>
+#include <climits>
 
 using namespace std;
 
@@ -16,99 +17,69 @@ string to_string(const T& value)
 
 const int MAX = 19;
 
-int N;
+int N, answer = INT_MIN;
 vector<string> expression;
-bool selected[MAX];
 
-void calculate_plus(int length)
+int calculate_add (string a, string b)
 {
-    vector<string>::iterator iter;
-    for (iter = expression.begin(); iter != expression.end(); iter++)
-    {
-        int result;
+    int x = atoi(a.c_str());
+    int y = atoi(b.c_str());
 
-        if ((*iter) == "+")
-        {
-            int a = atoi((*(iter - 1)).c_str());
-            int b = atoi((*(iter + 1)).c_str());
-
-            result = a + b;
-            expression.erase(iter - 1, iter + 2);
-            expression.insert(iter - 1, to_string(result));
-            break;
-        }
-   }
+    return x + y;
 }
 
-void calculate_sub(int length)
+int calculate_sub (string a, string b)
 {
-    vector<string>::iterator iter;
-    for (iter = expression.begin(); iter != expression.end(); iter++)
-    {
-        int result;
+    int x = atoi(a.c_str());
+    int y = atoi(b.c_str());
 
-        if ((*iter) == "-")
-        {
-            int a = atoi((*(iter - 1)).c_str());
-            int b = atoi((*(iter + 1)).c_str());
-
-            result = a - b;
-            expression.erase(iter - 1, iter + 2);
-            expression.insert(iter - 1, to_string(result));
-            break;
-        }
-   }
+    return x - y;
 }
 
-void calculate_mul(int length)
+int calculate_mul (string a, string b)
 {
-    vector<string>::iterator iter;
-    for (iter = expression.begin(); iter != expression.end(); iter++)
-    {
-        int result;
+    int x = atoi(a.c_str());
+    int y = atoi(b.c_str());
 
-        if ((*iter) == "*")
-        {
-            int a = atoi((*(iter - 1)).c_str());
-            int b = atoi((*(iter + 1)).c_str());
-
-            result = a * b;
-            expression.erase(iter - 1, iter + 2);
-            expression.insert(iter - 1, to_string(result));
-            break;
-        }
-   }
+    return x * y;
 }
 
-// void backtracking(int depth, int length)
-// {
-//     if (depth == length / 2)
-//     {
-//         return;
-//     }
-
-//     for (int i = 0; i < length; i++)
-//     {
-
-//     }
-// }
-
-void dfs(int depth, int length, vector<string> e)
+int calculate(string a, string b, string op)
 {
-    if (depth == length / 2)
+    if (op == "+")
+        return calculate_add(a, b);
+    else if (op == "-")
+        return calculate_sub(a, b);
+    else if (op == "*")
+        return calculate_mul(a, b);
+}
+
+void dfs(int depth, int result)
+{
+    if (depth > N - 1)
     {
+        answer = max(answer, result);
         return;
     }
 
-    vector<string> a;
-    a.assign(e.begin(), e.end());
+    string op = (depth == 0) ? "+" : expression[depth - 1];
+
+    if (depth + 2 < N)
+    {
+        int bracket = calculate(expression[depth], expression[depth + 2], expression[depth + 1]);
+        dfs(depth + 4, calculate(to_string(result), to_string(bracket), op));
+    }
+
+    dfs(depth + 2, calculate(to_string(result), expression[depth], op));
 }
 
-int main(int argc, char const *argv[])
+int main(int argc, char const* argv[])
 {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL), cout.tie(NULL);
+
     cin >> N;
 
-    int index = 0;
     string s = "";
     for (int i = 0; i < N; i++)
     {
@@ -128,11 +99,10 @@ int main(int argc, char const *argv[])
 
     expression.push_back(s);
 
-    calculate_mul(expression.size());
+    dfs(0, 0);
 
-    for (int i = 0; i < expression.size(); i++)
-        cout << expression[i] << " ";
-    cout << "\n";
+    cout << answer << "\n";
 
     return 0;
 }
+
