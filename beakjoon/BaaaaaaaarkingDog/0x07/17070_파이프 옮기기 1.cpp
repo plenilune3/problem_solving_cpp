@@ -34,6 +34,8 @@ void dfs(int x, int y, int d)
 
 int main(int argc, char const *argv[])
 {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL), cout.tie(NULL);
     cin >> N;
 
     for (int i = 1; i <= N; i++)
