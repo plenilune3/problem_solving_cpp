@@ -10,6 +10,7 @@ int N, answer = INT_MAX;
 int ward[MAX];
 bool A[MAX][MAX];
 bool selected[MAX];
+bool visited[MAX];
 vector<int> a;
 vector<int> b;
 
@@ -25,84 +26,46 @@ int differnce(int a, int b)
     return result;
 }
 
+int dfs(int depth, int x, vector<int>& a)
+{
+    int ret = 1;
+    visited[x] = true;
+
+    vector<int>::iterator iter;
+
+    for(iter = a.begin(); iter != a.end(); iter++)
+        if (visited[(*iter)] == false && A[x][(*iter)])
+            ret += dfs(depth + 1, (*iter), a);
+    
+    return ret;
+}
+
 void combinations(int depth)
 {
     if (depth == N + 1)
     {
-        int length_a = a.size();
-        int length_b = b.size();
-
-        if (length_a == N || length_b == N)
+        if (a.size() == N || b.size() == N)
             return;
         
-        int sum_a = 0;
-        for (int i = 0; i < length_a; i++)
-            sum_a += ward[a[i]];
-        
-        int sum_b = 0;
-        for (int i = 0; i < length_b; i++)
-            sum_b += ward[b[i]];
-        
-        if (length_a == 1)
+        fill_n(&visited[0], MAX, false);
+        int a_size = dfs(0, a[0], a);
+        int b_size = dfs(0, b[0], b);
+
+        if (a_size == a.size() && b_size == b.size())
         {
-            for (int i = 0; i < length_b; i++)
-            {
-                bool possible = false;
 
-                for (int j = 0; j < length_b; j++)
-                    if (A[b[i]][b[j]])
-                        possible = true;
-                
-                if (possible == false)
-                    return;
-            }
+            vector<int>::iterator iter;
+            int sum_a = 0, sum_b = 0;
 
-            answer = min(answer, differnce(sum_a, sum_b));
-            return;
-        }
-
-        if (length_b == 1)
-        {
-            for (int i = 0; i < length_a; i++)
-            {
-                bool possible = false;
-
-                for (int j = 0; j < length_a; j++)
-                    if (A[a[i]][a[j]])
-                        possible = true;
-                
-                if (possible == false)
-                    return;
-            }
-
+            for (iter = a.begin(); iter != a.end(); iter++)
+                sum_a += ward[(*iter)];
+            
+            for (iter = b.begin(); iter != b.end(); iter++)
+                sum_b += ward[(*iter)];
+            
             answer = min(answer, differnce(sum_a, sum_b));
         }
 
-        for (int i = 0; i < length_a; i++)
-        {
-            bool possible = false;
-
-            for (int j = 0; j < length_a; j++)
-                if (A[a[i]][a[j]])
-                    possible = true;
-            
-            if (possible == false)
-                return;
-        }
-
-        for (int i = 0; i < length_b; i++)
-        {
-            bool possible = false;
-
-            for (int j = 0; j < length_b; j++)
-                if (A[b[i]][b[j]])
-                    possible = true;
-            
-            if (possible == false)
-                return;
-        }
-
-        answer = min(answer, differnce(sum_a, sum_b));
         return;
     }
 
