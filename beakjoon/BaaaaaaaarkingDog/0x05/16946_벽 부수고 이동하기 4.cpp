@@ -54,19 +54,14 @@ int main(int argc, char const *argv[])
    
     for (int i = 0; i < N; i++)
         for (int j = 0; j < M; j++)
-        {
-            int result;
-
             if (board[i][j] == 0 && visited[i][j] == false)
             {
                 v.push_back(dfs(i, j, z));
                 z += 1;
             }
-        }
     
     for (int x = 0; x < N; x++)
         for (int y = 0; y < M; y++)
-        {
             if (board[x][y])
             {
                 set<int> s;
@@ -83,7 +78,6 @@ int main(int argc, char const *argv[])
                 for (set<int>::iterator iter = s.begin(); iter != s.end(); iter++)
                     board[x][y] += v[(*iter)];
             }
-        }
 
     for (int i = 0; i < N; i++)
     {
