@@ -3,24 +3,35 @@
 
 using namespace std;
 
-const int MAX = 1000;
+const int MAX = 1002;
 const int dx[] = { -1, 1, 0, 0 };
 const int dy[] = { 0, 0, -1, 1 };
 
 int N, M, H, W;
 int sx, sy, tx, ty;
-int board[MAX][MAX];
+bool board[MAX][MAX];
 int dist[MAX][MAX];
 
 bool is_possible(int x, int y)
 {
-    if (x + H >= N || y + W >= M)
+    if (x + (H - 1) > N || y + (W - 1) > M)
         return false;
     
-    for (int i = x; i <= x + H; i++)
-        for (int j = y; j <= y + W; j++)
-            if (board[i][j])
-                return false;
+    for (int i = 0; i < H; i++)
+        if (board[x + i][y])
+            return false;
+    
+    for (int i = 0; i < H; i++)
+        if (board[x + i][y + (W - 1)])
+            return false;
+    
+    for (int i = 0; i < W; i++)
+        if (board[x][y + i])
+            return false;
+    
+    for (int i = 0; i < W; i++)
+        if (board[x + (H - 1)][y + i])
+            return false;
     
     return true;
 }
@@ -36,7 +47,6 @@ int bfs()
     {
         int x = q.front().first, y = q.front().second;
         q.pop();
-        cout << x << " " << y << "\n";
 
         if (x == tx && y == ty)
             return dist[x][y];
@@ -45,7 +55,7 @@ int bfs()
         {
             int nx = x + dx[i], ny = y + dy[i];
 
-            if (nx < 0 || nx >= N || ny < 0 || ny >= M || dist[nx][ny] != -1)
+            if (board[nx][ny] || dist[nx][ny] != -1)
                 continue;
             
             if (is_possible(nx, ny))
@@ -66,15 +76,16 @@ int main(int argc, char const *argv[])
 
     cin >> N >> M;
 
-    for (int i = 0; i < N; i++)
-        for (int j = 0; j < M; j++)
-            cin >> board[i][j];
+    for (int i = 0; i < N + 2; i++)
+        for (int j = 0; j < M + 2; j++)
+        {
+            if (i == 0 || j == 0 || i == N + 1 || j == M + 1)
+                board[i][j] = 1;
+            else
+                cin >> board[i][j];
+        }
     
     cin >> H >> W >> sx >> sy >> tx >> ty;
-    sx -= 1;
-    sy -= 1;
-    tx -= 1;
-    ty -= 1;
 
     cout << bfs() << "\n";
 
