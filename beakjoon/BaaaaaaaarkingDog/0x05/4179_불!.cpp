@@ -23,7 +23,7 @@ void fire()
         {
             int nx = x + dx[i], ny = y + dy[i];
 
-            if (nx < 0 || nx >= R + 2 || ny < 0 || ny >= C + 2 || dist_fire[nx][ny] != -1)
+            if (nx <= 0 || nx >= R + 1 || ny <= 0 || ny >= C + 1 || dist_fire[nx][ny] != -1)
                 continue;
             
             if (board[nx][ny] == '.')
