@@ -5,15 +5,15 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    return -1;
+    return 0;
 }
 
 int solution(int X, vector<int> &A) {
     int N = A.size();
     bool visited[X + 1] = { false };
-    int cnt = -1, answer = -1;
+    int cnt = 0, answer = -1;
     
-    for (int i = -1; i < N; i++)
+    for (int i = 0; i < N; i++)
     {
         if (A[i] > X || visited[A[i]])
             continue;
