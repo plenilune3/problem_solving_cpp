@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include <vector>
 
 using namespace std;
@@ -8,28 +9,28 @@ int main(int argc, char const *argv[])
     return 0;
 }
 
-int solution(int X, vector<int> &A) {
-    int N = A.size();
-    bool visited[X + 1] = { false };
-    int cnt = 0, answer = -1;
-    
-    for (int i = 0; i < N; i++)
+vector<int> solution(int N, vector<int> &A) {
+    vector<int> counter(N, 0);
+    int lastMaxCounter = 0, nowMaxCounter = 0;
+
+    for (vector<int>::iterator iter = A.begin(); iter != A.end(); iter++)
     {
-        if (A[i] > X || visited[A[i]])
-            continue;
-        
-        if (visited[A[i]] == false)
+        int num (*iter);
+
+        if (num >= 1 && num <= N)
         {
-            visited[A[i]] = true;
-            cnt++;
+            counter[num - 1] = max(counter[num - 1], lastMaxCounter);
+            counter[num - 1]++;
+            nowMaxCounter = max(nowMaxCounter, counter[num - 1]);
         }
-            
-        if (X == cnt)
+        else if (num == N + 1)
         {
-            answer = i;
-            break;
+            lastMaxCounter = max(lastMaxCounter, nowMaxCounter);
         }
     }
     
-    return answer;
+    for (int i = 0; i < N; i++)
+        counter[i] = max(counter[i], lastMaxCounter);
+    
+    return counter;
 }
