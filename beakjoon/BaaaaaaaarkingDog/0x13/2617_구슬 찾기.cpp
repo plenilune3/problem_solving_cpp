@@ -18,20 +18,7 @@ int main(int argc, char const *argv[])
     for (int i = 1; i <= N; i++)
         for (int j = 1; j <= N; j++)
             heavy[i][j] = light[i][j] = (i == j) ? 0 : MAX;
-    
-    for (int i = 1; i <= N; i++)
-    {
-        for (int j = 1; j <= N; j++)
-            cout << heavy[i][j] << " ";
-        cout << "\n";
-    }
 
-    for (int i = 1; i <= N; i++)
-    {
-        for (int j = 1; j <= N; j++)
-            cout << light[i][j] << " ";
-        cout << "\n";
-    }
     while (M--)
     {
         int a, b;
@@ -64,7 +51,7 @@ int main(int argc, char const *argv[])
             if (light[i][j] != MAX) light_cnt++;
         }
 
-        if (heavy_cnt >= middle || light_cnt >= middle)
+        if (heavy_cnt > middle || light_cnt > middle)
             answer += 1;
     }
 
