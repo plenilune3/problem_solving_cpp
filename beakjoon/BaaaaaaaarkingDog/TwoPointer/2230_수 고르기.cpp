@@ -50,6 +50,7 @@ long long get_min_diff()
             if (diff < min_diff)
                 min_diff = diff;
             
+            // M이 0일 때 left와 right가 서로 계속 증가하여 N을 초과할 수 있다.
             if (left < N - 1)
                 left++;
             else
