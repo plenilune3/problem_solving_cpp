@@ -11,12 +11,11 @@ const int dy[] = { 0, 0, -1, 1 };
 
 struct wolf
 {
-    int x, y, d, c;
+    int x, y, d;
 
     bool operator<(const wolf &w) const
     {
         if (d != w.d) return d < w.d;
-        else if (c != w.c) return c < w.c;
         else if (x != w.x) return x < w.x;
         else return y < w.y;
     }
@@ -29,7 +28,7 @@ queue< pair<int, int> > q;
 int sx, sy, tx, ty;
 
 int abs(int a, int b);
-wolf make_wolf(int x, int y, int d, int c);
+wolf make_wolf(int x, int y, int d);
 void find_distance();
 int find_path(wolf w);
 
@@ -60,15 +59,15 @@ int main(int argc, char const *argv[])
     
     find_distance();
 
-    int answer = find_path(make_wolf(sx, sy, dist[sx][sy], dist[sx][sy]));
+    int answer = find_path(make_wolf(sx, sy, dist[sx][sy]));
     cout << answer << "\n";
    
     return 0;
 }
 
-wolf make_wolf(int x, int y, int d, int c)
+wolf make_wolf(int x, int y, int d)
 {
-    wolf w = { x, y, d, c };
+    wolf w = { x, y, d };
     return w;
 }
 
@@ -98,21 +97,21 @@ void find_distance()
 int find_path(wolf w)
 {
     int visited[MAX][MAX];
-    fill_n(&visited[0][0], MAX * MAX, INT_MIN);
+    fill_n(&visited[0][0], MAX * MAX, INT_MAX);
     priority_queue<wolf> pq;
     visited[w.x][w.y] = w.d;
     pq.push(w);
 
     while (!pq.empty())
     {
-        int x = pq.top().x, y = pq.top().y, d = pq.top().d, c = pq.top().c;
+        int x = pq.top().x, y = pq.top().y, d = pq.top().d;
         pq.pop();
 
-        if (visited[x][y] > d)
+        if (visited[x][y] < d)
             continue;
         
         if (x == tx && y == ty)
-            return c;
+            return d;
 
         for (int i = 0; i < 4; i++)
         {
@@ -123,10 +122,10 @@ int find_path(wolf w)
             
             int nd = dist[nx][ny];
 
-            if (visited[nx][ny] < nd)
+            if (visited[nx][ny] > nd)
             {
                 visited[nx][ny] = nd;
-                pq.push(make_wolf(nx, ny, nd, min(c, nd)));
+                pq.push(make_wolf(nx, ny, min(d, nd)));
             }
         }
     }
