@@ -77,5 +77,3 @@ int get_excellent(int x, bool is_excellent)
 
     return dp[x][is_excellent];
 }
-
-
