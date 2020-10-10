@@ -8,7 +8,7 @@ const int dy[] = { 0, 1, 0, -1 };
 
 int N, R, lx, ly;
 bool board[MAX][MAX];
-pair<int, int> dp[MAX][MAX];
+pair<int, int> dp[MAX][MAX][4];
 
 void get_laser(int &x, int &y, int &d);
 pair<int, int> dfs(int x, int y, int d);
@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
 
     while (T--)
     {
-        fill_n(&dp[0][0], MAX * MAX, make_pair(-1, -1));
+        fill_n(&dp[0][0][0], MAX * MAX * 4, make_pair(-1, -1));
         fill_n(&board[0][0], MAX * MAX, false);
 
         cin >> N >> R;
@@ -48,11 +48,8 @@ int main(int argc, char const *argv[])
 
 pair<int, int> dfs(int x, int y, int d)
 {
-    if (dp[x][y] != make_pair(-1, -1))
-    {
-        if (board[x][y]) return make_pair(0, 0);
-        else return dp[x][y];
-    }
+    if (dp[x][y][d] != make_pair(-1, -1))
+        return dp[x][y][d];
 
     if (x == 0 || x == N + 1 || y == 0 || y == N + 1)
         return make_pair(x, y);   
@@ -60,7 +57,7 @@ pair<int, int> dfs(int x, int y, int d)
     int nd = board[x][y] ? (d + 1) % 4 : d;
     int nx = x + dx[nd], ny = y + dy[nd];
 
-    return dp[x][y] = dfs(nx, ny, nd);
+    return dp[x][y][d] = dfs(nx, ny, nd);
 }
 
 void get_laser(int &x, int &y, int &d)
