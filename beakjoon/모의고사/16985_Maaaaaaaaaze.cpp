@@ -118,9 +118,7 @@ int find_path(bool board[MAX][MAX][MAX])
             if (nz < 0 || nz >= MAX || nx < 0 || nx >= MAX || ny < 0 || ny >= MAX)
                 continue;
             
-            if (board[nz][nx][ny] == fals        if (dist[z][x][y] > answer)
-            return -1;
-e || dist[nz][nx][ny] != -1)
+            if (board[nz][nx][ny] == false || dist[nz][nx][ny] != -1)
                 continue;
             
             dist[nz][nx][ny] = dist[z][x][y] + 1;
