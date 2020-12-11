@@ -1,13 +1,12 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
-const int MAX = 1e6 + 2;
-
-int N, M, T, K;
+int N, M, T, K, X, Y, answer;
 vector< pair<int, int> > v;
+
+int count_(int x, int y);
 
 int main(int argc, char const *argv[])
 {
@@ -16,16 +15,40 @@ int main(int argc, char const *argv[])
 
     cin >> N >> M >> T >> K;
 
-    while (T--)
+    for (int i = 0; i < T; i++)
     {
-        int X, Y; cin >> X >> Y;
-        v.push_back(make_pair(X, Y));
+        int x, y; cin >> x >> y;
+        v.push_back(make_pair(x, y));
     }
 
-    sort(v.begin(), v.end());
+    for (int i = 0; i < T; i++)
+        for (int j = 0; j < T; j++)
+        {
+            int x = (v[i].first + K > N) ? N - K : v[i].first;
+            int y = (v[j].second + K > M) ? M - K : v[j].second;
+
+            int temp = count_(x, y);
+
+            if (answer < temp)
+            {
+                answer = temp;
+                X = x, Y = y + K;
+            }
+        }
+    
+    cout << X << " " << Y << "\n";
+    cout << answer << "\n";
+
+    return 0;
+}
+
+int count_(int x, int y)
+{
+    int result = 0;
 
     for (vector< pair<int, int> >::iterator i = v.begin(); i != v.end(); i++)
-        cout << (*i).first << " " << (*i).second << "\n";
+        if (x <= (*i).first && (*i).first <= x + K && y <= (*i).second && (*i).second <= y + K)
+            result += 1;
     
-    return 0;
+    return result;
 }
