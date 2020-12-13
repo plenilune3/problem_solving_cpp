@@ -2,8 +2,6 @@
 
 using namespace std;
 
-const int MAX = 1e4 + 1;
-
 struct coordinate
 {
     int x, y;
@@ -27,7 +25,7 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < M; i++)
         for (int j = 0; j < M; j++)
         {
-            int x = C[i].x, y = C[i].y;
+            int x = C[i].x, y = C[j].y;
 
             for (int h = 1; h < I / 2; h++)
                 answer = max(answer, count_(x, y, h, I / 2 - h));
