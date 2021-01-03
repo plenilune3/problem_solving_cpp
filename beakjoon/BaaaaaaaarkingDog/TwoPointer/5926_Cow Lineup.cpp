@@ -48,21 +48,15 @@ int main(int argc, char const *argv[])
     {
         if (cnt >= total_herd)
         {
-            if (herd_cnt[cows[left].id] == 1)
+            if (--herd_cnt[cows[left++].id] == 0)
                 cnt -= 1;
-            
-            herd_cnt[cows[left].id] -= 1;
-            left += 1;
         }
         else if (right == N)
             break;
         else
         {
-            if (herd_cnt[cows[right].id] == 0)
+            if (++herd_cnt[cows[right++].id] == 1)
                 cnt += 1;
-            
-            herd_cnt[cows[right].id] += 1;
-            right += 1;
         }
 
         if (cnt == total_herd)
