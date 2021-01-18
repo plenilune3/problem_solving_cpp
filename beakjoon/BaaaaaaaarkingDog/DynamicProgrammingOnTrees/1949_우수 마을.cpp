@@ -60,7 +60,7 @@ void create_tree(int x)
 
 int get_excellent(int x, bool is_excellent)
 {
-    if (dp[x][is_excellent] != -1)
+    if (dp[x][is_excellent] != -1) 
         return dp[x][is_excellent];
     
     dp[x][is_excellent] = is_excellent ? villager[x] : 0;
