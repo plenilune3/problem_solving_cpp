@@ -2,18 +2,18 @@
 
 using namespace std;
 
-const int MAX = 65;
+const int MAX = (1 << 6) + 1;
 const int dx[] = { -1, 1, 0, 0 };
 const int dy[] = { 0, 0, -1, 1 };
 
-int N, Q, L;
-int A[MAX][MAX];
+int N, Q, L, A[MAX][MAX];
 bool visited[MAX][MAX];
 
-void find_(int x, int y, int l);
-void melt_(int l);
-void rotate_(int x, int y, int l);
-int dfs(int x, int y, int l);
+void rotate(int l, int A[MAX][MAX]);
+void melt(int L, int A[MAX][MAX]);
+int count_max_area(int L, int A[MAX][MAX]);
+int count_area(int x, int y);
+int sum_ice(int L, int A[MAX][MAX]);
 
 int main(int argc, char const *argv[])
 {
@@ -22,117 +22,120 @@ int main(int argc, char const *argv[])
 
     cin >> N >> Q;
 
-    int l = (1 << N);
+    L = (1 << N);
 
-    for (int i = 0; i < l; i++)
-        for (int j = 0; j < l; j++)
+    for (int i = 0; i < L; i++)
+        for (int j = 0; j < L; j++)
             cin >> A[i][j];
     
     while (Q--)
     {
-        cin >> L;
+        int l; cin >> l;
 
-        if (L != 0)
-            find_(0, 0, l);
+        l = (1 << l);
 
-        melt_(l);
+        rotate(l, A);
+        melt(L, A);
     }
 
-    int sum_ = 0, result = 0;
-
-    for (int i = 0; i < l; i++)
-        for (int j = 0; j < l; j++)
-        {
-            sum_ += A[i][j];
-
-            if (visited[i][j] || A[i][j] == 0)
-                continue;
-            
-            result = max(result, dfs(i, j, l));
-        }
-    
-    cout << sum_ << "\n";
-    cout << result << "\n";
+    cout << sum_ice(L, A) << "\n";
+    cout << count_max_area(L, A) << "\n";
 
     return 0;
 }
 
-void find_(int x, int y, int l)
+void rotate(int l, int A[MAX][MAX])
 {
-    if (l == (1 << L))
+    for (int i = 0; i < L; i += l)
     {
-        rotate_(x, y, l);
-        return;
-    }
+        for (int j = 0; j < L; j += l)
+        {
+            int B[l][l];
 
-    find_(x, y, l / 2);
-    find_(x + l / 2, y, l / 2);
-    find_(x, y + l / 2, l / 2);
-    find_(x + l / 2, y + l / 2, l / 2);
+            for (int x = 0; x < l; x++)
+                for (int y = 0; y < l; y++)
+                    B[x][y] = A[x + i][y + j];
+            
+            for (int x = 0; x < l; x++) 
+                for (int y = 0; y < l; y++)
+                    A[x + i][y + j] = B[l - 1 - y][x];
+        }
+    }
 }
 
-void melt_(int l)
+void melt(int L, int A[MAX][MAX])
 {
-    int A_copy[MAX][MAX];
-    copy(&A[0][0], &A[0][0] + MAX * MAX, &A_copy[0][0]);
+    int B[MAX][MAX];
+    copy(&A[0][0], &A[0][0] + MAX * MAX, &B[0][0]);
 
-    for (int x = 0; x < l; x++)
-        for (int y = 0; y < l; y++)
+    for (int x = 0; x < L; x++)
+        for (int y = 0; y < L; y++)
         {
+            int ice = 0;
+
             if (A[x][y] == 0)
                 continue;
 
-            int count_ = 0;
-
-            for (int i = 0; i < 4; i++)
+            for (int d = 0; d < 4; d++)
             {
-                int nx = x + dx[i], ny = y + dy[i];
+                int nx = x + dx[d], ny = y + dy[d];
 
-                if (nx < 0 || nx >= l || ny < 0 || ny >= l)
+                if (nx < 0 || nx >= L || ny < 0 || ny >= L)
                     continue;
                 
-                if (A[nx][ny] != 0)
-                    count_ += 1;
+                if (B[nx][ny] != 0)
+                    ice += 1;
             }
 
-            if (count_ < 3)
-                A_copy[x][y] -= 1;
+            if (ice < 3)
+                A[x][y] -= 1;
         }
-    
-    copy(&A_copy[0][0], &A_copy[0][0] + MAX * MAX, &A[0][0]);
 }
 
-void rotate_(int x, int y, int l)
+int sum_ice(int L, int A[MAX][MAX])
 {
-    int A_copy[l][l];
-    
-    for (int i = 0; i < l; i++)
-        for (int j = 0; j < l; j++)
-            A_copy[i][j] = A[i + x][j + y];
+    int result = 0;
 
-    for (int i = 0; i < l; i++)
-        for (int j = 0; j < l; j++)
-            A[i + x][j + y] = A_copy[l - 1 - j][i];
+    for (int i = 0; i < L; i++)
+        for (int j = 0; j < L; j++)
+            result += A[i][j];
+    
+    return result;
 }
 
-int dfs(int x, int y, int l)
+int count_area(int x, int y)
 {
-    visited[x][y] = true;
     int ret = 1;
+    visited[x][y] = true;
 
-    for (int i = 0; i < 4; i++)
+    for (int d = 0; d < 4; d++)
     {
-        int nx = x + dx[i], ny = y + dy[i];
+        int nx = x + dx[d], ny = y + dy[d];
 
-        if (nx < 0 || nx >= l || ny < 0 || ny >= l)
+        if (nx < 0 || nx >= L || ny < 0 || ny >= L)
             continue;
         
         if (visited[nx][ny] || A[nx][ny] == 0)
             continue;
         
-        ret += dfs(nx, ny, l);
+        ret += count_area(nx, ny);
     }
 
     return ret;
 }
 
+int count_max_area(int L, int A[MAX][MAX])
+{
+    int result = 0;
+
+    for (int x = 0; x < L; x++)
+        for (int y = 0; y < L; y++)
+        {
+            if (visited[x][y] || A[x][y] == 0)
+                continue;
+            
+            result = max(result, count_area(x, y));
+        }
+    
+    return result;
+}
