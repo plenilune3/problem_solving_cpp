@@ -4,12 +4,13 @@ using namespace std;
 
 const int MAX = 201;
 
-int N, K, A[MAX], counter;
+int N, K, L, A[MAX], answer;
 bool R[MAX];
 
-void rotate_();
-void move_();
-void put_();
+void rotate(int L, int *A, int N, bool *R);
+void move(int N, bool *R, int *A);
+void put(int *A, bool *R);
+int is_finished(int L, int *A);
 
 int main(int argc, char const *argv[])
 {
@@ -17,70 +18,83 @@ int main(int argc, char const *argv[])
     cin.tie(NULL), cout.tie(NULL);
 
     cin >> N >> K;
+    L = N * 2;
 
-    for (int i = 0; i < 2 * N; i++)
+    for (int i = 0; i < L; i++)
         cin >> A[i];
     
-    int answer = 0;
-
     while (true)
     {
         answer += 1;
 
-        rotate_();
-        move_();
-        put_();
-
-        if (counter >= K)
+        if (is_finished(L, A) >= K)
             break;
+        
+        rotate(L, A, N, R);
+        move(N, R, A);
+        put(A, R);
+
+        if (is_finished(L, A) >= K)
+            break;
+        
     }
 
     cout << answer << "\n";
-    
+   
     return 0;
 }
 
-void rotate_()
+void rotate(int L, int *A, int N, bool *R)
 {
-    int A_temp = A[2 * N - 1];
+    int B[L];
+    bool C[N];
 
-    for (int i = 2 * N - 1; i >= 1; i--)
-    {
-        A[i] = A[i - 1];
-        R[i] = R[i - 1];
-    }
+    for (int i = 0; i < L; i++)
+        B[i] = A[i];
+    
+    for (int i = 0; i < N; i++)
+        C[i] = R[i];
+    
+    for (int i = 0; i < L; i++)
+        A[(i + 1) % L] = B[i];
+    
+    for (int i = 0; i < N; i++)
+        R[(i + 1) % N] = C[i];
+    
+    R[N - 1] = false;
+}
+
+void move(int N, bool *R, int *A)
+{
+    bool C[N];
+
+    for (int i = N - 1; i > 0; i--)
+        if (A[i] != 0 && !R[i] && R[i - 1])
+        {
+            A[i] -= 1;
+            R[i] = true;
+            R[i - 1] = false;
+        }
 
     R[N - 1] = false;
-    R[0] = false;
-    A[0] = A_temp;
 }
 
-void move_()
+void put(int *A, bool *R)
 {
-    for (int i = N - 2; i >= 0; i--)
+    if (A[0] != 0 && R[0] == false)
     {
-        if (R[i] == false || R[i + 1] || A[i + 1] == 0)
-            continue;
-        
-        A[i + 1] -= 1;
-
-        if (A[i + 1] == 0)
-            counter += 1;
-
-        R[i] = false, R[i + 1] = true;
-
-        if (i + 1 == N - 1)
-            R[i + 1] = false;
+        A[0] -= 1;
+        R[0] = true;
     }
 }
 
-void put_()
+int is_finished(int L, int *A)
 {
-    if (A[0] == 0 || R[0])
-        return;
-    
-    R[0] = true, A[0] -= 1;
+    int result = 0;
 
-    if (A[0] == 0)
-        counter += 1;
+    for (int i = 0; i < L; i++)
+        if (A[i] == 0)
+            result += 1;
+    
+    return result;
 }
