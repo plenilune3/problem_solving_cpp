@@ -4,63 +4,71 @@
 
 using namespace std;
 
-struct piece
-{
-    int num, x, y, d;
-};
-
-const int MAX = 14;
+const int MAX = 15;
 const int dx[] = { 0, 0, 0, -1, 1 };
 const int dy[] = { 0, 1, -1, 0, 0 };
 
-int N, K;
-int color[MAX][MAX];
-vector<int> board[MAX][MAX];
-piece p[MAX * MAX];
+struct piece
+{
+    int idx, x, y, d;
 
-bool move_piece(int num);
-void change_dir(int &d);
-piece make_piece(int num, int x, int y, int d);
+    piece() : idx(0), x(0), y(0), d(0) {}
+    piece(int _idx, int _x, int _y, int _d) : idx(_idx), x(_x), y(_y), d(_d) {}
+};
+
+int N, K, A[MAX][MAX];
+vector<int> B[MAX][MAX];
+piece P[MAX * MAX];
+
+int move_piece(piece p);
+vector<int>::iterator choose_pieces(int idx, int x, int y);
+void move(vector<int> &c, int nx, int ny);
+int change_dir(int dir);
 
 int main(int argc, char const *argv[])
 {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL), cout.tie(NULL);
+
     cin >> N >> K;
 
     for (int i = 0; i < N + 2; i++)
         for (int j = 0; j < N + 2; j++)
             if (i == 0 || i == N + 1 || j == 0 || j == N + 1)
-                color[i][j] = 2;
+                A[i][j] = 2;
             else
-                cin >> color[i][j];
+                cin >> A[i][j];
     
     for (int i = 1; i <= K; i++)
     {
-        int x, y, d;
-        cin >> x >> y >> d;
-        p[i] = make_piece(i, x, y, d);
-        board[x][y].push_back(i);
+        int x, y, d; cin >> x >> y >> d;
+        P[i] = piece(i, x, y, d);
+        B[x][y].push_back(i);
     }
 
     int answer = 0;
 
     while (true)
     {
+        bool possible = true;
+        
         if (answer > 1000)
             break;
-
+        
         answer += 1;
-
-        bool is_possible = true;
 
         for (int k = 1; k <= K; k++)
         {
-            is_possible = move_piece(k);
+            int result = move_piece(P[k]);
 
-            if (is_possible == false)
+            if (result >= 4)
+            {
+                possible = false;
                 break;
+            }
         }
 
-        if (is_possible == false)
+        if (possible == false)
             break;
     }
 
@@ -68,81 +76,66 @@ int main(int argc, char const *argv[])
         cout << answer << "\n";
     else
         cout << -1 << "\n";
-
+    
     return 0;
 }
 
-bool move_piece(int num)
+int move_piece(piece p)
 {
-    int x = p[num].x, y = p[num].y, d = p[num].d;
+    int idx = p.idx, x = p.x, y = p.y, d = p.d;
     int nx = x + dx[d], ny = y + dy[d];
-    vector<int>::iterator iter;
     vector<int> v;
 
-    for (vector<int>::iterator i = board[x][y].begin(); i != board[x][y].end(); i++)
-        if ((*i) == num)
-        {
-            iter = i;
-            break;
-        }
-    
-    v.assign(iter, board[x][y].end());
+    vector<int>::iterator it = choose_pieces(idx, x, y);
+    v.assign(it, B[x][y].end());
     reverse(v.begin(), v.end());
 
-    if (color[nx][ny] != 2)
+    if (A[nx][ny] != 2)
     {
-        if (color[nx][ny] == 1)
-            reverse(v.begin(), v.end());
-        
-        while (!v.empty())
-        {
-            int n = v.back();
-            v.pop_back();
-            p[n].x = nx, p[n].y = ny;
-            board[nx][ny].push_back(n);
-        }
-
-        board[x][y].erase(iter, board[x][y].end());
+        move(v, nx, ny);
+        B[x][y].erase(it, B[x][y].end());
     }
     else
     {
-        change_dir(d);
-        p[num].d = d;
+        P[idx].d = change_dir(d);
+        d = P[idx].d;
         nx = x + dx[d], ny = y + dy[d];
 
-        if (color[nx][ny] != 2)
+        if (A[nx][ny] != 2)
         {
-            if (color[nx][ny] == 1)
-                reverse(v.begin(), v.end());
-
-            while (!v.empty())
-            {
-                int n = v.back();
-                v.pop_back();
-                p[n].x = nx, p[n].y = ny;
-                board[nx][ny].push_back(n);
-            }
-
-            board[x][y].erase(iter, board[x][y].end());
+            move(v, nx, ny);
+            B[x][y].erase(it, B[x][y].end());
         }
     }
 
-    if (board[nx][ny].size() >= 4)
-        return false;
-    else
-        return true;
+    return B[nx][ny].size();
 }
 
-void change_dir(int &d)
+vector<int>::iterator choose_pieces(int idx, int x, int y)
 {
-    if (d == 1) d = 2;
-    else if (d == 2) d = 1;
-    else if (d == 3) d = 4;
-    else d = 3;
+    for (vector<int>::iterator i = B[x][y].begin(); i != B[x][y].end(); i++)
+        if (idx == (*i))
+            return i;
 }
 
-piece make_piece(int num, int x, int y, int d)
+void move(vector<int> &v, int nx, int ny)
 {
-    piece p = { num, x, y, d };
-    return p;
+    if (A[nx][ny] == 1)
+        reverse(v.begin(), v.end());
+    
+    while (!v.empty())
+    {
+        int idx = v.back();
+        v.pop_back();
+        P[idx].x = nx, P[idx].y = ny;
+        B[nx][ny].push_back(idx);
+    }
+}
+
+int change_dir(int dir)
+{
+    if (dir == 1) return 2;
+    else if (dir == 2) return 1;
+    else if (dir == 3) return 4;
+    else return 3;
 }
