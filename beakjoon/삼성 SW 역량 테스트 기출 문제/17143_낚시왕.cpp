@@ -1,104 +1,147 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
-struct shark
+const int MAX = 101;
+const int dx[] = { 0, -1, 1, 0, 0 };
+const int dy[] = { 0, 0, 0, 1, -1 };
+
+struct shark 
 {
     int x, y, s, d, z;
+
+    shark(int _x, int _y, int _s, int _d, int _z) : x(_x), y(_y), s(_s), d(_d), z(_z) {}
+
+    bool operator< (const shark s) const
+    {
+        return z < s.z;
+    }
 };
 
-const int MAX = 101;
-const int dx[5] = { 0, -1, 1, 0, 0 };
-const int dy[5] = { 0, 0, 0, 1, -1 };
- 
-int R, C, M, answer;
-shark board[MAX][MAX];
+int R, C, M, A[MAX][MAX];
+vector<shark> v;
 
-int fishing(int y);
-void move_shark();
-void move(shark &s, shark board[MAX][MAX]);
-shark make_shark(int x, int y, int s, int d, int z);
+int catch_shark(int y, vector<shark> &v);
+int find_shark(int y);
+void move_sharks(vector<shark> &v);
+void move_shark(shark &s);
+int change_dir(int dir);
+void eat_shark(vector<shark> &v);
 
 int main(int argc, char const *argv[])
 {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL), cout.tie(NULL);
+
     cin >> R >> C >> M;
 
-    for (int i = 0; i < M; i++)
+    for (int k = 1; k <= M; k++)
     {
-        int x, y, s, d, z;
-        cin >> x >> y >> s >> d >> z;
-        board[x - 1][y - 1] = make_shark(x - 1, y - 1, s, d, z);
+        int x, y, s, d, z; cin >> x >> y >> s >> d >> z;
+        A[x - 1][y - 1] = z;
+
+        if (d == 1 || d == 2)
+            s = s % (R * 2 - 2);
+        else
+            s = s % (C * 2 - 2);
+
+        v.push_back(shark(x - 1, y - 1, s, d, z));
     }
 
-    for (int y = 0; y < C; y++)
-    {
-        int size = fishing(y);
-        answer += size;
+    int fisher_man = 0;
+    int answer = 0;
 
-        move_shark();
+    while (fisher_man < C)
+    {
+        answer += catch_shark(fisher_man++, v);
+        move_sharks(v);
+        eat_shark(v);
     }
 
     cout << answer << "\n";
 
     return 0;
-}    
-
-shark make_shark(int x, int y, int s, int d, int z)
-{    
-    if (d == 1 || d == 2) s = s % (R * 2 - 2);
-    else s = s % (C * 2 - 2);
-
-    shark sh = { x, y, s, d, z };
-    return sh;
 }
 
-int fishing(int y)
+int catch_shark(int y, vector<shark> &v)
+{
+    int z = find_shark(y);
+
+    if (z == 0)
+        return 0;
+    
+    for (vector<shark>::iterator i = v.begin(); i != v.end(); i++)
+        if ((*i).z == z)
+        {
+            A[(*i).x][(*i).y] = 0;
+            v.erase(i);
+            break;
+        }
+    
+    return z;
+}
+
+int find_shark(int y)
 {
     for (int x = 0; x < R; x++)
-        if (board[x][y].z)
-        {
-            int size = board[x][y].z;
-            board[x][y] = make_shark(0 ,0, 0, 0, 0);
-            return size;
-        }
-
+        if (A[x][y] != 0)
+            return A[x][y];
+    
     return 0;
 }
 
-void move_shark()
+void move_sharks(vector<shark> &v)
 {
-    shark board_c[MAX][MAX];
-    fill_n(&board_c[0][0], MAX * MAX, make_shark(0, 0, 0, 0, 0));
-
     for (int x = 0; x < R; x++)
         for (int y = 0; y < C; y++)
-            if (board[x][y].z)
-                move(board[x][y], board_c);
-    
-    copy(&board_c[0][0], &board_c[0][0] + MAX * MAX, &board[0][0]);
+            A[x][y] = 0;
+
+    sort(v.begin(), v.end());
+
+    for (vector<shark>::iterator i = v.begin(); i != v.end(); i++)
+        move_shark(*i);
+
+    for (vector<shark>::iterator i = v.begin(); i != v.end(); i++)
+        A[(*i).x][(*i).y] = (*i).z;
 }
 
-void move(shark &s, shark board[MAX][MAX])
+void move_shark(shark &s)
 {
-    int nx = s.x, ny = s.y;
-
     for (int i = 0; i < s.s; i++)
     {
-        nx = s.x + dx[s.d], ny = s.y + dy[s.d];
+        int nx = s.x + dx[s.d], ny = s.y + dy[s.d];
 
         if (nx < 0 || nx >= R || ny < 0 || ny >= C)
         {
-            if (s.d == 1) s.d = 2;
-            else if (s.d == 2) s.d = 1;
-            else if (s.d == 3) s.d = 4;
-            else s.d = 3;
+            s.d = change_dir(s.d);
+            nx = s.x + dx[s.d], ny = s.y + dy[s.d];
         }
 
-        nx = s.x + dx[s.d], ny = s.y + dy[s.d];
         s.x = nx, s.y = ny;
     }
+}
 
-    if (s.z >= board[nx][ny].z) board[nx][ny] = s;
+void eat_shark(vector<shark> &v)
+{
+    vector<shark>::iterator it = v.begin();
+
+    while (it != v.end())
+    {
+        int x = (*it).x, y = (*it).y, z = (*it).z;
+
+        if (A[x][y] != z)
+            it = v.erase(it);
+        else
+            it++;
+    }
+}
+
+int change_dir(int dir)
+{
+    if (dir == 1) return 2;
+    else if (dir == 2) return 1;
+    else if (dir == 3) return 4;
+    else return 3;
 }
