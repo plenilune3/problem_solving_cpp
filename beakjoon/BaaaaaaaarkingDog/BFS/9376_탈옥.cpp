@@ -89,6 +89,8 @@ int main(int argc, char const *argv[])
 
                     if (prison[i][j] == '#')
                         k -= 2;
+                    
+                    if (k < 0) continue;
 
                     answer = min(k, answer);
                 }
