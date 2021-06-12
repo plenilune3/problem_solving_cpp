@@ -4,22 +4,26 @@
 
 using namespace std;
 
-const int MAX = 101;
+const int MAX = 102;
 const int dx[] = { -1, 1, 0, 0 };
 const int dy[] = { 0, 0, -1, 1 };
 
 int N, M, answer = MAX * MAX;
-int ax, ay, bx, by, cx, cy, rx, ry;
 int visited[MAX][MAX];
-int trace[MAX * MAX];
+int prev_[MAX * MAX];
 
-int convert(int x, int y);
+int find_path_ab(int ax, int ay, int bx, int by, int cx, int cy, int rx, int ry);
 int find_path(int ax, int ay, int bx, int by);
+void draw_line(int bx, int by);
+int ctoi(int x, int y);
+pair<int, int> itoc(int p);
 
 int main(int argc, char const *argv[])
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL), cout.tie(NULL);
+
+    int ax, ay, bx, by, cx, cy, rx, ry;
     
     cin >> M >> N;
     N += 1, M += 1;
@@ -27,46 +31,39 @@ int main(int argc, char const *argv[])
     cin >> ay >> ax >> by >> bx;
     cin >> cy >> cx >> ry >> rx;
 
-    fill_n(&visited[0][0], MAX * MAX, -1);
-    int a = find_path(ax, ay, bx, by);
+    int A = find_path_ab(ax, ay, bx, by, cx, cy, rx, ry);
+    int B = find_path_ab(cx, cy, rx, ry, ax, ay, bx, by);
 
-    for (int x = 0; x < M; x++)
-    {
-        for (int y = 0; y < N; y++)
-            cout << convert(x, y) << " ";
-        cout << "\n";
-    }
-
-    for (int x = 0; x < M; x++)
-    {
-        for (int y = 0; y < N; y++)
-            cout << visited[x][y] << " ";
-        cout << "\n";
-    }
-
-    int b = find_path(cx, cy, rx, ry);
-
-    cout << a << " " << b << "\n";
-
-    if (a == -1 || b == -1)
-        answer = MAX * MAX;
+    if (A == -1 && B == -1)
+        cout << "IMPOSSIBLE" << "\n";
+    else if (A == -1)
+        cout << B << "\n";
+    else if (B == -1)
+        cout << A << "\n";
     else
-        answer = min(answer, a + b);
-
-    fill_n(&visited[0][0], MAX * MAX, -1);
-    int c = find_path(cx, cy, rx, ry);
-    int d = find_path(ax, ay, bx, by);
-
-    cout << c << " " << d << "\n";
-
-    if (c == -1 || d == -1)
-        answer = min(answer, MAX * MAX);
-    else
-        answer = min(answer, c + d);
-    
-    cout << answer << "\n";
+        cout << min(A, B) << "\n";
 
     return 0;
+}
+
+int find_path_ab(int ax, int ay, int bx, int by, int cx, int cy, int rx, int ry)
+{
+    fill_n(&visited[0][0], MAX * MAX, -1);
+    fill_n(&prev_[0], MAX * MAX, -1);
+    visited[cx][cy] = 0;
+    visited[rx][ry] = 0;
+    int dist_a = find_path(ax, ay, bx, by);
+
+    fill_n(&visited[0][0], MAX * MAX, -1);
+    visited[ax][ay] = 0;
+    visited[bx][by] = 0;
+    draw_line(bx, by);
+    int dist_b = find_path(cx, cy, rx, ry);
+
+    if (dist_a == -1 || dist_b == -1)
+        return -1;
+    else
+        return dist_a + dist_b;
 }
 
 int find_path(int ax, int ay, int bx, int by)
@@ -94,6 +91,7 @@ int find_path(int ax, int ay, int bx, int by)
             if (visited[nx][ny] != -1)
                 continue;
                
+            prev_[ctoi(nx, ny)] = ctoi(x, y);
             visited[nx][ny] = visited[x][y] + 1;
             q.push(make_pair(nx, ny));
         }
@@ -102,7 +100,24 @@ int find_path(int ax, int ay, int bx, int by)
     return -1;
 }
 
-int convert(int x, int y)
+void draw_line(int bx, int by)
 {
-    return x * N + y;
+    int p = ctoi(bx, by);
+
+    while (prev_[p] != -1)
+    {
+        pair<int, int> c = itoc(p);
+        visited[c.first][c.second] = 0;
+        p = prev_[p];
+    }
+}
+
+int ctoi(int x, int y)
+{
+    return x * M + y;
+}
+
+pair<int, int> itoc(int p)
+{
+    return make_pair(p / M, p % M);
 }
