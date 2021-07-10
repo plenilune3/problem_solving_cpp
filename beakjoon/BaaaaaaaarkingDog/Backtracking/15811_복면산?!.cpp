@@ -1,20 +1,21 @@
 #include <iostream>
 #include <vector>
-#include <cstring>
 #include <string>
-#include <map>
+#include <set>
 
 using namespace std;
 
 const int MAX = 18;
 
-int N, M, K, D;
-char A[MAX], B[MAX], C[MAX];
-bool visited[10];
-vector<int> v;
-void find_num(int depth, int index);
+int D;
+string A, B, C;
+bool visited[10], possible;
+int num_of_alpha[26];
+vector<int> alpha;
 
-int	count_alpha(char A[MAX], char B[MAX], char C[MAX]);
+void find_num(int depth);
+unsigned long long stoll(string &S);
+vector<int> find_alpha(string &A, string &B, string &C);
 
 int main(int argc, char const *argv[])
 {
@@ -23,51 +24,66 @@ int main(int argc, char const *argv[])
 
 	cin >> A >> B >> C;
 
-	N = strlen(A), M = strlen(B), K = strlen(C);
+	alpha = find_alpha(A, B, C);
+	D = (int) alpha.size();
 
-	D = count_alpha(A, B, C);
+	find_num(0);
 
-	find_num(0, 0);
+	if (possible)
+		cout << "YES" << "\n";
+	else
+		cout << "NO" << "\n";
 
 	return 0;
 }
 
-void find_num(int depth, int index)
+void find_num(int depth)
 {
+	if (possible)
+		return;
+
 	if (depth == D)
 	{
-		for (vector<int>::iterator i = v.begin(); i != v.end(); i++)
-			cout << (*i) << " ";
-		cout << "\n";
+		if ((stoll(A) + stoll(B)) == stoll(C))
+			possible = true;
 		return;
 	}
 
-	for (int i = index; i < 10; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		if (visited[i]) continue;
 		
 		visited[i] = true;
-		v.push_back(i);
-		find_num(depth + 1, i);
+		num_of_alpha[alpha[depth]] = i;
+		find_num(depth + 1);
 		visited[i] = false;
-		v.pop_back();
 	}
 }
 
-int	count_alpha(char A[MAX], char B[MAX], char C[MAX])
+unsigned long long stoll(string &S)
 {
-	int result = 0;
-	int alpha[26] = { 0 };
+	unsigned long long result = 0;
+	int N = (int) S.size();
 
 	for (int i = 0; i < N; i++)
-		alpha[A[i] - 'A'] += 1;
-	for (int i = 0; i < M; i++)
-		alpha[B[i] - 'A'] += 1;
-	for (int i = 0; i < K; i++)
-		alpha[C[i] - 'A'] += 1;
-	for (int i = 0; i < 26; i++)
-		if (alpha[i])
-			result += 1;
+		result = result * 10 + num_of_alpha[S[i] - 'A'];
 	
+	return result;
+}
+
+vector<int> find_alpha(string &A, string &B, string &C)
+{
+	vector<int> result;
+	set<char> s;
+
+	for (int i = 0; i < A.size(); i++)
+		s.insert(A[i]);
+	for (int i = 0; i < B.size(); i++)
+		s.insert(B[i]);
+	for (int i = 0; i < C.size(); i++)
+		s.insert(C[i]);
+	for (set<char>::iterator i = s.begin(); i != s.end(); i++)
+		result.push_back((*i) - 'A');
+
 	return result;
 }
