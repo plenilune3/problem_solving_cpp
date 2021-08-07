@@ -1,29 +1,37 @@
-#include <cstdio>
-#include <cstring>
+#include <iostream>
 
 using namespace std;
 
+string N;
+int A[10], answer;
+
 int main(int argc, char const *argv[])
 {
-    char room_number[7];
-    int numbers[10] = {0};
-    int number = 0;
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL), cout.tie(NULL);
 
-    scanf("%s", room_number);
+    cin >> N;
 
-    for (int i = 0; i < strlen(room_number); i++)
-        numbers[room_number[i] - '0'] += 1;
+    for (string::iterator i = N.begin(); i != N.end(); i++)
+    {
+        char c = (*i);
+        A[c - '0'] += 1;
+    }
+
+    answer = min(A[6], A[9]);
+
+    int temp = A[6] >= A[9] ? A[6] - A[9] : A[9] - A[6];
+    answer = answer + (temp / 2) + (temp % 2);
 
     for (int i = 0; i < 10; i++)
     {
-        if (numbers[i] > numbers[number])
-            number = i;
-    }
+        if (i == 6 || i == 9)
+            continue;
 
-    if (number == 6 || number == 9)
-        printf("%d\n", ((numbers[6] + numbers[9] - 1) / 2) + 1);
-    else
-        printf("%d\n", numbers[number]);
+        answer = max(answer, A[i]);
+    }
+    
+    cout << answer << "\n";
 
     return 0;
 }

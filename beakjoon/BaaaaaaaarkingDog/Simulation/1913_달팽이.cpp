@@ -19,6 +19,7 @@ int main(int argc, char const *argv[])
     int x = N / 2, y = N / 2;
     int k = 0, d = 0, sw = 1;
     board[x][y] = ++k;
+    is_target(x, y);
 
     while (true)
     {
